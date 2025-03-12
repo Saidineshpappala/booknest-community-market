@@ -1,605 +1,348 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { 
-  BookOpen, 
-  Upload, 
-  CheckCircle2,
-  CircleDollarSign,
-  Truck,
-  ShieldCheck
-} from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import { BookPlus, ArrowRight, HelpCircle } from "lucide-react";
 
 const SellBooks = () => {
-  const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [activeStep, setActiveStep] = useState(isLoggedIn ? 1 : 0);
+  const { isLoggedIn } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  // Form states
-  const [bookDetails, setBookDetails] = useState({
+  const [bookData, setBookData] = useState({
     title: "",
     author: "",
     isbn: "",
     category: "",
-    condition: "new",
+    condition: "",
     description: "",
     price: "",
     images: [] as File[]
   });
-  
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setBookData({ ...bookData, [name]: value });
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setBookData({ ...bookData, [name]: value });
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setBookDetails({
-        ...bookDetails,
-        images: Array.from(e.target.files)
-      });
+      const filesArray = Array.from(e.target.files);
+      setBookData({ ...bookData, images: [...bookData.images, ...filesArray] });
     }
   };
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setBookDetails({
-      ...bookDetails,
-      [name]: value
-    });
+
+  const removeImage = (index: number) => {
+    const updatedImages = [...bookData.images];
+    updatedImages.splice(index, 1);
+    setBookData({ ...bookData, images: updatedImages });
   };
-  
-  const handleSelectChange = (name: string, value: string) => {
-    setBookDetails({
-      ...bookDetails,
-      [name]: value
-    });
-  };
-  
-  const handleNextStep = () => {
-    if (activeStep === 0 && !isLoggedIn) {
-      toast({
-        title: "Authentication required",
-        description: "Please log in to list your books for sale.",
-      });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isLoggedIn) {
+      toast.error("Please log in to sell books");
       navigate("/login");
       return;
     }
     
-    if (activeStep === 1) {
-      // Validate book details
-      if (!bookDetails.title || !bookDetails.author || !bookDetails.price) {
-        toast({
-          variant: "destructive",
-          title: "Missing information",
-          description: "Please fill in all required fields.",
-        });
-        return;
-      }
+    // Validate form
+    if (!bookData.title || !bookData.author || !bookData.category || 
+        !bookData.condition || !bookData.price) {
+      toast.error("Please fill in all required fields");
+      return;
     }
     
-    setActiveStep(activeStep + 1);
-    window.scrollTo(0, 0);
-  };
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
     setIsSubmitting(true);
     
-    try {
-      // In a real app, you would submit the form data to your backend
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      toast({
-        title: "Book listed successfully",
-        description: "Your book has been listed for sale on BookNest.",
-      });
-      
-      setActiveStep(3); // Move to success step
-      window.scrollTo(0, 0);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Submission failed",
-        description: "There was an error listing your book. Please try again.",
-      });
-    } finally {
+    // In a real app, you would upload images and send data to a server
+    setTimeout(() => {
+      toast.success("Your book has been listed for sale!");
       setIsSubmitting(false);
-    }
+      // Reset form or redirect
+      setBookData({
+        title: "",
+        author: "",
+        isbn: "",
+        category: "",
+        condition: "",
+        description: "",
+        price: "",
+        images: []
+      });
+    }, 1500);
   };
-  
-  const renderStepContent = () => {
-    switch (activeStep) {
-      case 0:
-        return (
-          <div className="text-center py-8">
-            <h2 className="text-2xl font-bold mb-4">Authentication Required</h2>
-            <p className="text-muted-foreground mb-6">
-              You need to be logged in to sell books on BookNest.
-            </p>
-            <Button 
-              className="bg-booknest-600 hover:bg-booknest-700"
-              onClick={() => navigate("/login")}
-            >
-              Log In
-            </Button>
-            <p className="mt-4 text-sm">
-              Don't have an account yet?{" "}
-              <a href="/register" className="text-booknest-600 hover:underline">
-                Create an Account
-              </a>
-            </p>
-          </div>
-        );
-      
-      case 1:
-        return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6">Book Details</h2>
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Book Title *</Label>
-                  <Input
-                    id="title"
-                    name="title"
-                    placeholder="Enter book title"
-                    value={bookDetails.title}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="author">Author *</Label>
-                  <Input
-                    id="author"
-                    name="author"
-                    placeholder="Enter author name"
-                    value={bookDetails.author}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label htmlFor="isbn">ISBN (optional)</Label>
-                  <Input
-                    id="isbn"
-                    name="isbn"
-                    placeholder="e.g., 978-3-16-148410-0"
-                    value={bookDetails.isbn}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="category">Category *</Label>
-                  <Select onValueChange={(value) => handleSelectChange("category", value)}>
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="fiction">Fiction</SelectItem>
-                      <SelectItem value="non-fiction">Non-Fiction</SelectItem>
-                      <SelectItem value="mystery">Mystery & Thriller</SelectItem>
-                      <SelectItem value="science-fiction">Science Fiction</SelectItem>
-                      <SelectItem value="fantasy">Fantasy</SelectItem>
-                      <SelectItem value="romance">Romance</SelectItem>
-                      <SelectItem value="biography">Biography</SelectItem>
-                      <SelectItem value="history">History</SelectItem>
-                      <SelectItem value="science">Science & Technology</SelectItem>
-                      <SelectItem value="business">Business & Economics</SelectItem>
-                      <SelectItem value="children">Children's Books</SelectItem>
-                      <SelectItem value="textbooks">Textbooks</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Book Condition *</Label>
-                <RadioGroup 
-                  defaultValue="new"
-                  onValueChange={(value) => handleSelectChange("condition", value)}
-                  className="flex flex-col space-y-1"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="new" id="condition-new" />
-                    <Label htmlFor="condition-new">New - Never been read, perfect condition</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="like-new" id="condition-like-new" />
-                    <Label htmlFor="condition-like-new">Like New - Appears unread, no visible wear</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="very-good" id="condition-very-good" />
-                    <Label htmlFor="condition-very-good">Very Good - Minimal wear, no markings</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="good" id="condition-good" />
-                    <Label htmlFor="condition-good">Good - Some wear, may have markings</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="acceptable" id="condition-acceptable" />
-                    <Label htmlFor="condition-acceptable">Acceptable - Visible wear, may have markings</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="rare" id="condition-rare" />
-                    <Label htmlFor="condition-rare">Rare - Collectible, special edition, or out-of-print</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Describe your book (condition details, edition, etc.)"
-                  className="h-32"
-                  value={bookDetails.description}
-                  onChange={handleInputChange}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="price">Price (USD) *</Label>
-                <Input
-                  id="price"
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="0.00"
-                  value={bookDetails.price}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="images">Upload Images (Max 5)</Label>
-                <div className="border-2 border-dashed border-muted rounded-md p-6 text-center">
-                  <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Drag and drop files here, or click to browse
-                  </p>
-                  <Input
-                    id="images"
-                    type="file"
-                    multiple
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleFileChange}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => document.getElementById("images")?.click()}
-                  >
-                    Select Files
-                  </Button>
-                  {bookDetails.images.length > 0 && (
-                    <div className="mt-4 text-sm">
-                      {bookDetails.images.length} file(s) selected
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              <Button
-                type="button"
-                className="bg-booknest-600 hover:bg-booknest-700"
-                onClick={handleNextStep}
-              >
-                Continue to Shipping & Policies
-              </Button>
-            </div>
-          </div>
-        );
-      
-      case 2:
-        return (
-          <form onSubmit={handleSubmit}>
-            <h2 className="text-2xl font-bold mb-6">Shipping & Policies</h2>
-            <div className="space-y-6">
-              <Tabs defaultValue="shipping">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="shipping">Shipping Options</TabsTrigger>
-                  <TabsTrigger value="policies">Seller Policies</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="shipping" className="space-y-6">
-                  <div className="space-y-4">
-                    <div className="flex items-start space-x-2">
-                      <input type="checkbox" id="standard-shipping" className="mt-1" defaultChecked />
-                      <div>
-                        <Label htmlFor="standard-shipping" className="font-medium">Standard Shipping</Label>
-                        <p className="text-sm text-muted-foreground">
-                          5-7 business days, $3.99 (buyer pays)
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-2">
-                      <input type="checkbox" id="expedited-shipping" className="mt-1" />
-                      <div>
-                        <Label htmlFor="expedited-shipping" className="font-medium">Expedited Shipping</Label>
-                        <p className="text-sm text-muted-foreground">
-                          2-3 business days, $8.99 (buyer pays)
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-2">
-                      <input type="checkbox" id="international-shipping" className="mt-1" />
-                      <div>
-                        <Label htmlFor="international-shipping" className="font-medium">International Shipping</Label>
-                        <p className="text-sm text-muted-foreground">
-                          7-14 business days, varies by country (buyer pays)
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start space-x-2">
-                      <input type="checkbox" id="free-shipping" className="mt-1" />
-                      <div>
-                        <Label htmlFor="free-shipping" className="font-medium">Free Shipping</Label>
-                        <p className="text-sm text-muted-foreground">
-                          Offer free shipping (you pay shipping costs)
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="policies" className="space-y-6">
-                  <div className="space-y-4">
-                    <div className="p-4 border rounded-md bg-muted/20">
-                      <h3 className="font-medium mb-2">Returns & Refunds</h3>
-                      <p className="text-sm text-muted-foreground mb-2">
-                        By listing on BookNest, you agree to our standard 14-day return policy for items not as described.
-                      </p>
-                      <div className="flex items-start space-x-2 mt-4">
-                        <input type="checkbox" id="extended-returns" className="mt-1" />
-                        <div>
-                          <Label htmlFor="extended-returns" className="font-medium">Offer Extended Returns (Optional)</Label>
-                          <p className="text-sm text-muted-foreground">
-                            Allow 30-day returns for any reason
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="p-4 border rounded-md bg-muted/20">
-                      <h3 className="font-medium mb-2">Seller Guarantee</h3>
-                      <p className="text-sm text-muted-foreground">
-                        You certify that the book is authentic and in the condition described. 
-                        Misrepresentation may result in penalties or account suspension.
-                      </p>
-                    </div>
-                    
-                    <div className="p-4 border rounded-md bg-muted/20">
-                      <h3 className="font-medium mb-2">Payment Processing</h3>
-                      <p className="text-sm text-muted-foreground">
-                        BookNest handles payment processing and will deposit funds to your account 
-                        after the buyer receives the item (typically 3 business days after delivery).
-                        A 10% service fee applies to all sales.
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start space-x-2">
-                    <input type="checkbox" id="terms-agreement" className="mt-1" required />
-                    <Label htmlFor="terms-agreement" className="text-sm">
-                      I have read and agree to the <a href="/terms" className="text-booknest-600 hover:underline">Terms of Service</a> and 
-                      <a href="/seller-guidelines" className="text-booknest-600 hover:underline"> Seller Guidelines</a>.
-                    </Label>
-                  </div>
-                </TabsContent>
-              </Tabs>
-              
-              <div className="flex gap-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setActiveStep(1)}
-                >
-                  Back
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-booknest-600 hover:bg-booknest-700"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Listing Book..." : "List Book for Sale"}
-                </Button>
-              </div>
-            </div>
-          </form>
-        );
-      
-      case 3:
-        return (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle2 className="h-8 w-8 text-green-600" />
-            </div>
-            <h2 className="text-2xl font-bold mb-4">Book Listed Successfully!</h2>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Your book has been listed for sale on BookNest. You'll be notified when someone purchases your book.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                className="bg-booknest-600 hover:bg-booknest-700"
-                onClick={() => {
-                  setActiveStep(1);
-                  setBookDetails({
-                    title: "",
-                    author: "",
-                    isbn: "",
-                    category: "",
-                    condition: "new",
-                    description: "",
-                    price: "",
-                    images: []
-                  });
-                }}
-              >
-                List Another Book
-              </Button>
-              <Button 
-                variant="outline" 
-                onClick={() => navigate("/account")}
-              >
-                View My Listings
-              </Button>
-            </div>
-          </div>
-        );
-      
-      default:
-        return null;
-    }
-  };
-  
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
+      
       <div className="bg-muted/30 py-8">
         <div className="container">
           <h1 className="text-3xl font-bold">Sell Your Books</h1>
           <p className="text-muted-foreground mt-2">
-            List your books for sale on BookNest and reach thousands of readers
+            List your books for sale and connect with buyers in our community
           </p>
         </div>
       </div>
       
       <main className="container py-8 flex-grow">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="lg:w-3/4">
-            {/* Steps indicator */}
-            {isLoggedIn && (
-              <div className="mb-8">
-                <div className="flex items-center">
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${activeStep >= 1 ? "bg-booknest-600 text-white" : "bg-muted text-foreground"}`}>
-                    1
+        <div className="max-w-4xl mx-auto">
+          <Tabs defaultValue="single" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsTrigger value="single">Sell a Single Book</TabsTrigger>
+              <TabsTrigger value="bulk">Bulk Listing</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="single">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookPlus className="h-5 w-5 text-booknest-600" />
+                    List Your Book
+                  </CardTitle>
+                  <CardDescription>
+                    Fill in the details about the book you want to sell
+                  </CardDescription>
+                </CardHeader>
+                
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="title">Book Title <span className="text-red-500">*</span></Label>
+                        <Input 
+                          id="title"
+                          name="title"
+                          value={bookData.title}
+                          onChange={handleChange}
+                          placeholder="Enter the book title"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="author">Author <span className="text-red-500">*</span></Label>
+                        <Input 
+                          id="author"
+                          name="author"
+                          value={bookData.author}
+                          onChange={handleChange}
+                          placeholder="Enter the author's name"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="isbn">ISBN (Optional)</Label>
+                        <Input 
+                          id="isbn"
+                          name="isbn"
+                          value={bookData.isbn}
+                          onChange={handleChange}
+                          placeholder="Enter ISBN if available"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="price">Price ($) <span className="text-red-500">*</span></Label>
+                        <Input 
+                          id="price"
+                          name="price"
+                          type="number"
+                          step="0.01"
+                          min="0.01"
+                          value={bookData.price}
+                          onChange={handleChange}
+                          placeholder="Enter your asking price"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="category">Category <span className="text-red-500">*</span></Label>
+                        <Select onValueChange={(value) => handleSelectChange("category", value)}>
+                          <SelectTrigger id="category">
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="fiction">Fiction</SelectItem>
+                            <SelectItem value="nonfiction">Non-Fiction</SelectItem>
+                            <SelectItem value="mystery">Mystery & Thriller</SelectItem>
+                            <SelectItem value="scifi">Science Fiction</SelectItem>
+                            <SelectItem value="romance">Romance</SelectItem>
+                            <SelectItem value="biography">Biography</SelectItem>
+                            <SelectItem value="history">History</SelectItem>
+                            <SelectItem value="children">Children's Books</SelectItem>
+                            <SelectItem value="textbooks">Textbooks</SelectItem>
+                            <SelectItem value="comics">Comics & Graphic Novels</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="condition">Condition <span className="text-red-500">*</span></Label>
+                        <Select onValueChange={(value) => handleSelectChange("condition", value)}>
+                          <SelectTrigger id="condition">
+                            <SelectValue placeholder="Select condition" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="new">New</SelectItem>
+                            <SelectItem value="like-new">Like New</SelectItem>
+                            <SelectItem value="very-good">Very Good</SelectItem>
+                            <SelectItem value="good">Good</SelectItem>
+                            <SelectItem value="acceptable">Acceptable</SelectItem>
+                            <SelectItem value="poor">Poor</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="description">Description</Label>
+                      <Textarea 
+                        id="description"
+                        name="description"
+                        value={bookData.description}
+                        onChange={handleChange}
+                        placeholder="Describe the book, its condition, and any other relevant details"
+                        className="min-h-[100px]"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="images">Book Images</Label>
+                      <div className="border border-input rounded-md p-4">
+                        <Input 
+                          id="images"
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleFileChange}
+                          className="mb-4"
+                        />
+                        
+                        {bookData.images.length > 0 && (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+                            {bookData.images.map((image, index) => (
+                              <div key={index} className="relative group">
+                                <img 
+                                  src={URL.createObjectURL(image)} 
+                                  alt={`Book image ${index + 1}`}
+                                  className="w-full h-24 object-cover rounded-md"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => removeImage(index)}
+                                  className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Upload clear photos of your book. Include front cover, back cover, and any signs of wear if applicable.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-end pt-4">
+                      <Button type="submit" disabled={isSubmitting} className="bg-booknest-600 hover:bg-booknest-700">
+                        {isSubmitting ? "Listing Book..." : "List Book for Sale"}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            
+            <TabsContent value="bulk">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Bulk Book Listing</CardTitle>
+                  <CardDescription>
+                    For sellers who want to list multiple books at once
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col items-center justify-center py-12 text-center space-y-6">
+                    <div className="bg-muted/50 rounded-full p-4">
+                      <HelpCircle className="h-10 w-10 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-medium mb-2">Bulk Listing Coming Soon</h3>
+                      <p className="text-muted-foreground max-w-md mx-auto">
+                        We're currently developing a bulk upload feature to make it easier to list multiple books at once. 
+                        For now, please use the single listing option.
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => document.querySelector('button[value="single"]')?.click()}
+                    >
+                      Switch to Single Listing
+                    </Button>
                   </div>
-                  <div className={`w-12 h-0.5 mx-2 ${activeStep >= 2 ? "bg-booknest-600" : "bg-muted"}`}></div>
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${activeStep >= 2 ? "bg-booknest-600 text-white" : "bg-muted text-foreground"}`}>
-                    2
-                  </div>
-                  <div className={`w-12 h-0.5 mx-2 ${activeStep >= 3 ? "bg-booknest-600" : "bg-muted"}`}></div>
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-full ${activeStep >= 3 ? "bg-booknest-600 text-white" : "bg-muted text-foreground"}`}>
-                    3
-                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+          
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle>Selling Guidelines</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium">Pricing Tips</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Research similar books to set a competitive price. Consider the book's condition, rarity, 
+                    and demand when setting your price.
+                  </p>
                 </div>
-                <div className="flex text-xs mt-2">
-                  <div className="w-8 text-center">Details</div>
-                  <div className="flex-1"></div>
-                  <div className="w-8 text-center">Policies</div>
-                  <div className="flex-1"></div>
-                  <div className="w-8 text-center">Done</div>
+                <div>
+                  <h3 className="font-medium">Book Condition Guidelines</h3>
+                  <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
+                    <li><span className="font-medium">New:</span> Never opened or read, perfect condition</li>
+                    <li><span className="font-medium">Like New:</span> Appears unread with no visible wear</li>
+                    <li><span className="font-medium">Very Good:</span> May show small signs of wear, no highlighting/notes</li>
+                    <li><span className="font-medium">Good:</span> May have some wear, minimal highlighting/notes</li>
+                    <li><span className="font-medium">Acceptable:</span> Readable with noticeable wear, may have marks/notes</li>
+                  </ul>
+                </div>
+                <div>
+                  <h3 className="font-medium">Shipping & Returns</h3>
+                  <p className="text-sm text-muted-foreground">
+                    You'll be notified when someone purchases your book. You're responsible for 
+                    shipping within 3 business days. Returns are accepted within 14 days if the item description was inaccurate.
+                  </p>
                 </div>
               </div>
-            )}
-            
-            {/* Step content */}
-            <Card>
-              <CardContent className="p-6">
-                {renderStepContent()}
-              </CardContent>
-            </Card>
-          </div>
-          
-          <div className="lg:w-1/4">
-            <div className="sticky top-24">
-              <Card className="mb-4">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Why Sell on BookNest?</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4 pt-0">
-                  <div className="flex gap-3">
-                    <CircleDollarSign className="h-5 w-5 text-booknest-600 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-medium text-sm">Competitive Fees</h4>
-                      <p className="text-xs text-muted-foreground">
-                        Only 10% service fee, lower than most marketplaces
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <BookOpen className="h-5 w-5 text-booknest-600 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-medium text-sm">Book Enthusiast Community</h4>
-                      <p className="text-xs text-muted-foreground">
-                        Connect with readers who value your books
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <Truck className="h-5 w-5 text-booknest-600 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-medium text-sm">Flexible Shipping</h4>
-                      <p className="text-xs text-muted-foreground">
-                        Choose your preferred shipping methods
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-3">
-                    <ShieldCheck className="h-5 w-5 text-booknest-600 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-medium text-sm">Secure Payments</h4>
-                      <p className="text-xs text-muted-foreground">
-                        Payment processing and seller protection
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Selling Tips</CardTitle>
-                  <CardDescription>Maximize your sales with these tips</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-3 pt-0">
-                  <p className="text-sm">
-                    <span className="font-medium">Quality Photos</span> - Clear, well-lit images from multiple angles.
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-medium">Detailed Description</span> - Be honest about condition and include edition details.
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-medium">Fair Pricing</span> - Research similar listings to set competitive prices.
-                  </p>
-                  <p className="text-sm">
-                    <span className="font-medium">Quick Shipping</span> - Ship promptly and provide tracking information.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
+            </CardContent>
+            <CardFooter className="bg-muted/30 text-sm text-muted-foreground">
+              By listing a book, you agree to our seller terms and conditions. BookNest takes a 5% commission on successful sales.
+            </CardFooter>
+          </Card>
         </div>
       </main>
       

@@ -11,7 +11,8 @@ import {
   ShoppingCart, 
   User, 
   Heart,
-  LogOut
+  LogOut,
+  X
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
@@ -27,6 +28,7 @@ import {
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const { isLoggedIn, user, logout } = useAuth();
   const { itemCount } = useCart();
   const navigate = useNavigate();
@@ -34,6 +36,20 @@ const Navbar = () => {
   const handleLogout = () => {
     logout();
     navigate("/");
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Navigate to the search results page with the query
+      navigate(`/books?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+    }
+  };
+
+  const closeSearch = () => {
+    setIsSearchOpen(false);
+    setSearchQuery("");
   };
 
   return (
@@ -104,14 +120,27 @@ const Navbar = () => {
         
         <div className="flex items-center ml-auto gap-2">
           {isSearchOpen ? (
-            <div className="flex items-center">
-              <Input 
-                placeholder="Search books, authors..." 
-                className="w-[200px] md:w-[300px]"
-                autoFocus
-                onBlur={() => setIsSearchOpen(false)}
-              />
-            </div>
+            <form onSubmit={handleSearch} className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-6 bg-background/80 backdrop-blur-sm md:relative md:inset-auto md:bg-transparent md:backdrop-blur-none">
+              <div className="relative w-full max-w-lg md:w-[300px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none" />
+                <Input 
+                  placeholder="Search books, authors..." 
+                  className="pr-10 pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={closeSearch}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                >
+                  <X className="h-5 w-5 text-muted-foreground hover:text-foreground" />
+                </button>
+              </div>
+              <button type="submit" className="sr-only">Search</button>
+              <div className="md:hidden fixed inset-0 -z-10" onClick={closeSearch}></div>
+            </form>
           ) : (
             <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(true)}>
               <Search className="h-5 w-5" />

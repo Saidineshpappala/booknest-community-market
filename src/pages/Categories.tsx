@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -156,21 +157,21 @@ const Categories = () => {
                       
                       <div className="space-y-2">
                         {category.subcategories.slice(0, 5).map((subcategory) => (
-                          <a 
+                          <Link 
                             key={subcategory} 
-                            href={`/categories/${category.id}/${subcategory.toLowerCase().replace(/\s+/g, '-')}`}
+                            to={`/categories/${category.id}/${subcategory.toLowerCase().replace(/\s+/g, '-')}`}
                             className="block text-sm hover:text-booknest-600 hover:underline underline-offset-2"
                           >
                             {subcategory}
-                          </a>
+                          </Link>
                         ))}
                         {category.subcategories.length > 5 && (
-                          <a 
-                            href={`/categories/${category.id}`}
+                          <Link 
+                            to={`/categories/${category.id}`}
                             className="block text-sm text-booknest-600 hover:underline underline-offset-2 font-medium"
                           >
                             + {category.subcategories.length - 5} more
-                          </a>
+                          </Link>
                         )}
                       </div>
                       
@@ -179,9 +180,9 @@ const Categories = () => {
                         className="w-full mt-4"
                         asChild
                       >
-                        <a href={`/categories/${category.id}`}>
+                        <Link to={`/categories/${category.id}`}>
                           Browse {category.name}
-                        </a>
+                        </Link>
                       </Button>
                     </CardContent>
                   </Card>
@@ -204,9 +205,9 @@ const Categories = () => {
                           className="w-full"
                           asChild
                         >
-                          <a href={`/categories/${category.id}/${subcategory.toLowerCase().replace(/\s+/g, '-')}`}>
+                          <Link to={`/categories/${category.id}/${subcategory.toLowerCase().replace(/\s+/g, '-')}`}>
                             Browse Books
-                          </a>
+                          </Link>
                         </Button>
                       </CardContent>
                     </Card>
@@ -221,9 +222,9 @@ const Categories = () => {
             <h2 className="text-2xl font-bold mb-6">Popular Authors</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {Array.from({ length: 12 }).map((_, idx) => (
-                <a 
+                <Link 
                   key={idx} 
-                  href={`/authors/${idx}`}
+                  to={`/authors/${idx}`}
                   className="text-center group"
                 >
                   <div className="w-24 h-24 mx-auto rounded-full overflow-hidden mb-3 bg-muted">
@@ -238,7 +239,7 @@ const Categories = () => {
                       "F. Scott Fitzgerald", "Ernest Hemingway", "J.R.R. Tolkien", "Virginia Woolf", 
                       "Charles Dickens", "William Shakespeare"][idx]}
                   </h4>
-                </a>
+                </Link>
               ))}
             </div>
           </div>
