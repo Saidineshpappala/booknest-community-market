@@ -11,6 +11,7 @@ import { Slider } from "@/components/ui/slider";
 import { Heart, ShoppingCart, Filter } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { useCart } from "@/contexts/CartContext";
 
 type BookItem = {
   id: string;
@@ -131,6 +132,18 @@ const books: BookItem[] = [
 const Books = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [priceRange, setPriceRange] = useState([0, 50]);
+  const { addItem } = useCart();
+
+  const handleAddToCart = (book: BookItem) => {
+    addItem({
+      id: book.id,
+      title: book.title,
+      author: book.author,
+      cover: book.cover,
+      price: book.price,
+      condition: book.condition
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -293,7 +306,10 @@ const Books = () => {
                     </div>
                   </CardContent>
                   <CardFooter className="pt-0">
-                    <Button className="w-full bg-booknest-600 hover:bg-booknest-700">
+                    <Button 
+                      className="w-full bg-booknest-600 hover:bg-booknest-700"
+                      onClick={() => handleAddToCart(book)}
+                    >
                       <ShoppingCart className="h-4 w-4 mr-2" />
                       Add to Cart
                     </Button>

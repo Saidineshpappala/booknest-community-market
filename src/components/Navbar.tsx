@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -10,11 +10,31 @@ import {
   Search, 
   ShoppingCart, 
   User, 
-  Heart
+  Heart,
+  LogOut
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/contexts/CartContext";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { isLoggedIn, user, logout } = useAuth();
+  const { itemCount } = useCart();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -38,6 +58,32 @@ const Navbar = () => {
                 <Link to="/sell" className="text-muted-foreground hover:text-foreground">Sell Books</Link>
                 <Link to="/community" className="text-muted-foreground hover:text-foreground">Community</Link>
                 <Link to="/about" className="text-muted-foreground hover:text-foreground">About</Link>
+              </div>
+              
+              <div className="mt-auto mb-4">
+                {isLoggedIn ? (
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Link to="/login">
+                      <Button variant="default" className="w-full bg-booknest-600 hover:bg-booknest-700">
+                        Sign In
+                      </Button>
+                    </Link>
+                    <Link to="/register">
+                      <Button variant="outline" className="w-full">
+                        Create Account
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </div>
             </SheetContent>
           </Sheet>
@@ -81,18 +127,54 @@ const Navbar = () => {
           </Link>
           
           <Link to="/cart">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="relative">
               <ShoppingCart className="h-5 w-5" />
+              {itemCount > 0 && (
+                <Badge className="absolute -top-1 -right-1 px-1.5 h-5 min-w-5 bg-booknest-600 font-medium flex items-center justify-center">
+                  {itemCount}
+                </Badge>
+              )}
               <span className="sr-only">Cart</span>
             </Button>
           </Link>
           
-          <Link to="/account">
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
-              <span className="sr-only">Account</span>
-            </Button>
-          </Link>
+          {isLoggedIn ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                  <span className="sr-only">User menu</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>
+                  {user?.name || user?.email}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/account">My Account</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/orders">My Orders</Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/wishlist">My Wishlist</Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/login">
+              <Button variant="ghost" size="icon">
+                <User className="h-5 w-5" />
+                <span className="sr-only">Login</span>
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </header>
