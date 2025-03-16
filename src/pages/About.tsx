@@ -7,32 +7,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+
 const teamMembers = [{
-  name: "Sarah Johnson",
+  name: "Sai Dinesh Pappala",
   role: "Founder & CEO",
-  bio: "Book enthusiast and former publishing executive with 15 years of experience in the industry. Sarah founded BookNest with the vision of creating a community-driven marketplace for book lovers.",
-  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Sarah"
+  bio: "Book enthusiast and former publishing executive with 15 years of experience in the industry. Sai Dinesh founded BookNest with the vision of creating a community-driven marketplace for book lovers.",
+  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Sai"
 }, {
-  name: "David Chen",
-  role: "Chief Technology Officer",
-  bio: "Tech innovator with a passion for literature. David leads our development team, ensuring BookNest delivers a seamless experience for readers and sellers alike.",
-  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=David"
-}, {
-  name: "Maya Patel",
+  name: "Krish",
   role: "Community Manager",
-  bio: "Literature graduate and social media expert. Maya nurtures our growing community of book enthusiasts and coordinates our virtual and in-person events.",
-  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Maya"
+  bio: "Literature graduate and social media expert. Krish nurtures our growing community of book enthusiasts and coordinates our virtual and in-person events.",
+  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Krish"
 }, {
-  name: "James Wilson",
+  name: "Rahul",
   role: "Head of Operations",
-  bio: "Former bookstore owner with deep knowledge of the bookselling industry. James oversees our marketplace operations and seller relationships.",
-  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=James"
+  bio: "Former bookstore owner with deep knowledge of the bookselling industry. Rahul oversees our marketplace operations and seller relationships.",
+  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Rahul"
 }, {
-  name: "Olivia Martinez",
+  name: "Anand",
   role: "Content Director",
-  bio: "Journalist and book reviewer who curates our featured selections and author spotlights. Olivia ensures that readers discover books they'll love.",
-  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Olivia"
+  bio: "Journalist and book reviewer who curates our featured selections and author spotlights. Anand ensures that readers discover books they'll love.",
+  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Anand"
 }];
+
 const values = [{
   icon: <BookOpen className="h-8 w-8 text-booknest-600" />,
   title: "Love of Reading",
@@ -54,6 +51,7 @@ const values = [{
   title: "Inclusivity",
   description: "We champion diverse voices and stories, ensuring our platform represents the rich tapestry of human experience."
 }];
+
 const About = () => {
   const [activeTab, setActiveTab] = useState("story");
   return <div className="min-h-screen flex flex-col">
@@ -79,7 +77,6 @@ const About = () => {
               </TabsList>
             </div>
             
-            {/* Story Tab Content */}
             <TabsContent value="story" className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div>
@@ -145,7 +142,6 @@ const About = () => {
               </div>
             </TabsContent>
             
-            {/* Mission Tab Content */}
             <TabsContent value="mission" className="space-y-12">
               <div className="text-center max-w-3xl mx-auto">
                 <h2 className="text-3xl font-serif font-semibold mb-4">Our Mission</h2>
@@ -200,7 +196,6 @@ const About = () => {
               </div>
             </TabsContent>
             
-            {/* Team Tab Content */}
             <TabsContent value="team" className="space-y-8">
               <div className="text-center max-w-3xl mx-auto mb-8">
                 <h2 className="text-3xl font-serif font-semibold mb-4">Meet Our Team</h2>
