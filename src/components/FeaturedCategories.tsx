@@ -1,5 +1,5 @@
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 
 type CategoryItem = {
@@ -49,6 +49,15 @@ const categories: CategoryItem[] = [
 ];
 
 const FeaturedCategories = () => {
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (categoryId: string) => {
+    // Setup the search parameters for the books page
+    navigate(`/books`, {
+      state: { category: categoryId }
+    });
+  };
+
   return (
     <section className="container py-12 md:py-16">
       <div className="flex items-center justify-between mb-8">
@@ -59,23 +68,25 @@ const FeaturedCategories = () => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
         {categories.map((category) => (
-          <Link key={category.id} to={`/categories/${category.id}`}>
-            <Card className="overflow-hidden hover:shadow-md transition-shadow h-full">
-              <div className="aspect-square relative overflow-hidden">
-                <img 
-                  src={category.image} 
-                  alt={category.name}
-                  className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-300" 
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/0 flex items-end p-4">
-                  <div className="text-white">
-                    <h3 className="font-medium">{category.name}</h3>
-                    <p className="text-sm text-white/80">{category.count} books</p>
-                  </div>
+          <Card 
+            key={category.id} 
+            className="overflow-hidden hover:shadow-md transition-shadow h-full cursor-pointer"
+            onClick={() => handleCategoryClick(category.id)}
+          >
+            <div className="aspect-square relative overflow-hidden">
+              <img 
+                src={category.image} 
+                alt={category.name}
+                className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-300" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/0 flex items-end p-4">
+                <div className="text-white">
+                  <h3 className="font-medium">{category.name}</h3>
+                  <p className="text-sm text-white/80">{category.count} books</p>
                 </div>
               </div>
-            </Card>
-          </Link>
+            </div>
+          </Card>
         ))}
       </div>
     </section>

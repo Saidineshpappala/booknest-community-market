@@ -4,6 +4,8 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Heart, ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
+import { useToast } from "@/components/ui/use-toast";
 
 type BookItem = {
   id: string;
@@ -58,21 +60,39 @@ const books: BookItem[] = [
     }
   },
   {
-    id: "b4",
-    title: "Sapiens: A Brief History of Humankind",
-    author: "Yuval Noah Harari",
-    cover: "https://images.unsplash.com/photo-1629992101753-56d196c8aabb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=690&q=80",
-    price: 14.99,
-    originalPrice: 19.99,
+    id: "b9",
+    title: "Dune",
+    author: "Frank Herbert",
+    cover: "https://images.unsplash.com/photo-1586339392738-d6ae85b5d5a7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+    price: 18.99,
     condition: "new",
     seller: {
-      name: "Book Emporium",
-      rating: 4.9
+      name: "SciFi Store",
+      rating: 4.8
     }
   }
 ];
 
 const FeaturedBooks = () => {
+  const { addItem } = useCart();
+  const { toast } = useToast();
+
+  const handleAddToCart = (book: BookItem) => {
+    addItem({
+      id: book.id,
+      title: book.title,
+      author: book.author,
+      cover: book.cover,
+      price: book.price,
+      condition: book.condition
+    });
+    
+    toast({
+      title: "Added to cart",
+      description: `${book.title} has been added to your cart.`,
+    });
+  };
+
   return (
     <section className="bg-muted/30 py-12 md:py-16">
       <div className="container">
@@ -128,7 +148,10 @@ const FeaturedBooks = () => {
                 </div>
               </CardContent>
               <CardFooter className="pt-0">
-                <Button className="w-full bg-booknest-600 hover:bg-booknest-700">
+                <Button 
+                  className="w-full bg-booknest-600 hover:bg-booknest-700"
+                  onClick={() => handleAddToCart(book)}
+                >
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   Add to Cart
                 </Button>
