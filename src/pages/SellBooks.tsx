@@ -1,348 +1,319 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import { useAuth } from "@/contexts/AuthContext";
+import { Check, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { toast } from "sonner";
-import { BookPlus, ArrowRight, HelpCircle } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import { toast } from "@/hooks/use-toast";
+
+const categories = [
+  "Fiction",
+  "Non-Fiction",
+  "Mystery",
+  "Sci-Fi",
+  "Fantasy",
+  "Romance",
+  "Thriller",
+  "Biography",
+  "History",
+  "Science",
+  "Self-Help",
+  "Children's",
+  "Young Adult",
+  "Poetry",
+  "Reference",
+  "Art & Photography",
+  "Cookbooks",
+];
+
+const conditions = [
+  "Brand New",
+  "Like New",
+  "Very Good",
+  "Good",
+  "Acceptable",
+];
 
 const SellBooks = () => {
+  const [bookTitle, setBookTitle] = useState("");
+  const [author, setAuthor] = useState("");
+  const [price, setPrice] = useState("");
+  const [category, setCategory] = useState("");
+  const [condition, setCondition] = useState("");
+  const [description, setDescription] = useState("");
+  const [images, setImages] = useState<File[]>([]);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const { isLoggedIn } = useAuth();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [bookData, setBookData] = useState({
-    title: "",
-    author: "",
-    isbn: "",
-    category: "",
-    condition: "",
-    description: "",
-    price: "",
-    images: [] as File[]
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setBookData({ ...bookData, [name]: value });
-  };
-
-  const handleSelectChange = (name: string, value: string) => {
-    setBookData({ ...bookData, [name]: value });
-  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const filesArray = Array.from(e.target.files);
-      setBookData({ ...bookData, images: [...bookData.images, ...filesArray] });
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFiles = Array.from(e.target.files);
+      
+      // Create preview URLs
+      const newImageUrls = selectedFiles.map(file => URL.createObjectURL(file));
+      
+      setImages(prev => [...prev, ...selectedFiles]);
+      setImageUrls(prev => [...prev, ...newImageUrls]);
     }
   };
 
-  const removeImage = (index: number) => {
-    const updatedImages = [...bookData.images];
-    updatedImages.splice(index, 1);
-    setBookData({ ...bookData, images: updatedImages });
+  const handleRemoveImage = (index: number) => {
+    // Revoke the object URL to avoid memory leaks
+    URL.revokeObjectURL(imageUrls[index]);
+    
+    setImageUrls(prev => prev.filter((_, i) => i !== index));
+    setImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!isLoggedIn) {
-      toast.error("Please log in to sell books");
-      navigate("/login");
-      return;
-    }
-    
-    // Validate form
-    if (!bookData.title || !bookData.author || !bookData.category || 
-        !bookData.condition || !bookData.price) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    // In a real app, you would upload images and send data to a server
-    setTimeout(() => {
-      toast.success("Your book has been listed for sale!");
-      setIsSubmitting(false);
-      // Reset form or redirect
-      setBookData({
-        title: "",
-        author: "",
-        isbn: "",
-        category: "",
-        condition: "",
-        description: "",
-        price: "",
-        images: []
+    // Validation
+    if (!bookTitle.trim() || !author.trim() || !price.trim() || !category || !condition || !description.trim()) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill out all required fields",
+        variant: "destructive",
       });
-    }, 1500);
+      return;
+    }
+    
+    if (images.length === 0) {
+      toast({
+        title: "Images Required",
+        description: "Please upload at least one image of your book",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Submit logic would go here
+    // For now, just show a success message
+    toast({
+      title: "Book Listed Successfully!",
+      description: "Your book has been listed for sale.",
+      variant: "default",
+    });
+    
+    // Reset form
+    setBookTitle("");
+    setAuthor("");
+    setPrice("");
+    setCategory("");
+    setCondition("");
+    setDescription("");
+    setImages([]);
+    setImageUrls([]);
+    
+    // Navigate to home or listings page
+    navigate("/");
+  };
+
+  const triggerFileInput = () => {
+    // Use optional chaining to avoid errors if ref is null
+    fileInputRef.current?.click();
   };
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
       
-      <div className="bg-muted/30 py-8">
-        <div className="container">
-          <h1 className="text-3xl font-bold">Sell Your Books</h1>
-          <p className="text-muted-foreground mt-2">
-            List your books for sale and connect with buyers in our community
-          </p>
-        </div>
-      </div>
-      
-      <main className="container py-8 flex-grow">
-        <div className="max-w-4xl mx-auto">
-          <Tabs defaultValue="single" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8">
-              <TabsTrigger value="single">Sell a Single Book</TabsTrigger>
-              <TabsTrigger value="bulk">Bulk Listing</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="single">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookPlus className="h-5 w-5 text-booknest-600" />
-                    List Your Book
-                  </CardTitle>
-                  <CardDescription>
-                    Fill in the details about the book you want to sell
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="title">Book Title <span className="text-red-500">*</span></Label>
-                        <Input 
-                          id="title"
-                          name="title"
-                          value={bookData.title}
-                          onChange={handleChange}
-                          placeholder="Enter the book title"
-                          required
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="author">Author <span className="text-red-500">*</span></Label>
-                        <Input 
-                          id="author"
-                          name="author"
-                          value={bookData.author}
-                          onChange={handleChange}
-                          placeholder="Enter the author's name"
-                          required
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="isbn">ISBN (Optional)</Label>
-                        <Input 
-                          id="isbn"
-                          name="isbn"
-                          value={bookData.isbn}
-                          onChange={handleChange}
-                          placeholder="Enter ISBN if available"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="price">Price ($) <span className="text-red-500">*</span></Label>
-                        <Input 
-                          id="price"
-                          name="price"
-                          type="number"
-                          step="0.01"
-                          min="0.01"
-                          value={bookData.price}
-                          onChange={handleChange}
-                          placeholder="Enter your asking price"
-                          required
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="category">Category <span className="text-red-500">*</span></Label>
-                        <Select onValueChange={(value) => handleSelectChange("category", value)}>
-                          <SelectTrigger id="category">
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="fiction">Fiction</SelectItem>
-                            <SelectItem value="nonfiction">Non-Fiction</SelectItem>
-                            <SelectItem value="mystery">Mystery & Thriller</SelectItem>
-                            <SelectItem value="scifi">Science Fiction</SelectItem>
-                            <SelectItem value="romance">Romance</SelectItem>
-                            <SelectItem value="biography">Biography</SelectItem>
-                            <SelectItem value="history">History</SelectItem>
-                            <SelectItem value="children">Children's Books</SelectItem>
-                            <SelectItem value="textbooks">Textbooks</SelectItem>
-                            <SelectItem value="comics">Comics & Graphic Novels</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="condition">Condition <span className="text-red-500">*</span></Label>
-                        <Select onValueChange={(value) => handleSelectChange("condition", value)}>
-                          <SelectTrigger id="condition">
-                            <SelectValue placeholder="Select condition" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="new">New</SelectItem>
-                            <SelectItem value="like-new">Like New</SelectItem>
-                            <SelectItem value="very-good">Very Good</SelectItem>
-                            <SelectItem value="good">Good</SelectItem>
-                            <SelectItem value="acceptable">Acceptable</SelectItem>
-                            <SelectItem value="poor">Poor</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="description">Description</Label>
-                      <Textarea 
-                        id="description"
-                        name="description"
-                        value={bookData.description}
-                        onChange={handleChange}
-                        placeholder="Describe the book, its condition, and any other relevant details"
-                        className="min-h-[100px]"
-                      />
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="images">Book Images</Label>
-                      <div className="border border-input rounded-md p-4">
-                        <Input 
-                          id="images"
-                          type="file"
-                          accept="image/*"
-                          multiple
-                          onChange={handleFileChange}
-                          className="mb-4"
-                        />
-                        
-                        {bookData.images.length > 0 && (
-                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
-                            {bookData.images.map((image, index) => (
-                              <div key={index} className="relative group">
-                                <img 
-                                  src={URL.createObjectURL(image)} 
-                                  alt={`Book image ${index + 1}`}
-                                  className="w-full h-24 object-cover rounded-md"
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => removeImage(index)}
-                                  className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
-                                  ✕
-                                </button>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                        
-                        <p className="text-xs text-muted-foreground mt-2">
-                          Upload clear photos of your book. Include front cover, back cover, and any signs of wear if applicable.
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex justify-end pt-4">
-                      <Button type="submit" disabled={isSubmitting} className="bg-booknest-600 hover:bg-booknest-700">
-                        {isSubmitting ? "Listing Book..." : "List Book for Sale"}
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Button>
-                    </div>
-                  </form>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="bulk">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Bulk Book Listing</CardTitle>
-                  <CardDescription>
-                    For sellers who want to list multiple books at once
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-col items-center justify-center py-12 text-center space-y-6">
-                    <div className="bg-muted/50 rounded-full p-4">
-                      <HelpCircle className="h-10 w-10 text-muted-foreground" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-medium mb-2">Bulk Listing Coming Soon</h3>
-                      <p className="text-muted-foreground max-w-md mx-auto">
-                        We're currently developing a bulk upload feature to make it easier to list multiple books at once. 
-                        For now, please use the single listing option.
-                      </p>
-                    </div>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => document.querySelector('button[value="single"]')?.click()}
-                    >
-                      Switch to Single Listing
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+      <main className="flex-grow container mx-auto px-4 py-8">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-serif font-bold mb-2">Sell Your Books</h1>
+          <p className="text-muted-foreground mb-8">List your pre-loved books for sale on our marketplace.</p>
           
-          <Card className="mt-8">
+          <Card>
             <CardHeader>
-              <CardTitle>Selling Guidelines</CardTitle>
+              <CardTitle>Book Details</CardTitle>
+              <CardDescription>Provide information about the book you want to sell.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-medium">Pricing Tips</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Research similar books to set a competitive price. Consider the book's condition, rarity, 
-                    and demand when setting your price.
-                  </p>
+            
+            <form onSubmit={handleSubmit}>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="bookTitle">Book Title *</Label>
+                    <Input 
+                      id="bookTitle" 
+                      value={bookTitle}
+                      onChange={(e) => setBookTitle(e.target.value)}
+                      placeholder="Enter the book title"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="author">Author *</Label>
+                    <Input 
+                      id="author" 
+                      value={author}
+                      onChange={(e) => setAuthor(e.target.value)}
+                      placeholder="Author's name"
+                      required
+                    />
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium">Book Condition Guidelines</h3>
-                  <ul className="text-sm text-muted-foreground list-disc pl-5 space-y-1">
-                    <li><span className="font-medium">New:</span> Never opened or read, perfect condition</li>
-                    <li><span className="font-medium">Like New:</span> Appears unread with no visible wear</li>
-                    <li><span className="font-medium">Very Good:</span> May show small signs of wear, no highlighting/notes</li>
-                    <li><span className="font-medium">Good:</span> May have some wear, minimal highlighting/notes</li>
-                    <li><span className="font-medium">Acceptable:</span> Readable with noticeable wear, may have marks/notes</li>
-                  </ul>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="price">Price (USD) *</Label>
+                    <Input 
+                      id="price" 
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value.replace(/[^0-9.]/g, ''))}
+                      placeholder="0.00"
+                      type="text"
+                      inputMode="decimal"
+                      required
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="category">Category *</Label>
+                    <Select value={category} onValueChange={setCategory} required>
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="condition">Condition *</Label>
+                    <Select value={condition} onValueChange={setCondition} required>
+                      <SelectTrigger id="condition">
+                        <SelectValue placeholder="Select condition" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {conditions.map((cond) => (
+                          <SelectItem key={cond} value={cond}>{cond}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium">Shipping & Returns</h3>
-                  <p className="text-sm text-muted-foreground">
-                    You'll be notified when someone purchases your book. You're responsible for 
-                    shipping within 3 business days. Returns are accepted within 14 days if the item description was inaccurate.
-                  </p>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description *</Label>
+                  <Textarea 
+                    id="description" 
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Describe the book's condition, edition, any marks or highlights, etc."
+                    rows={5}
+                    required
+                  />
                 </div>
-              </div>
-            </CardContent>
-            <CardFooter className="bg-muted/30 text-sm text-muted-foreground">
-              By listing a book, you agree to our seller terms and conditions. BookNest takes a 5% commission on successful sales.
-            </CardFooter>
+                
+                <Separator />
+                
+                <div className="space-y-4">
+                  <Label>Book Images *</Label>
+                  <div 
+                    className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/50 transition-colors"
+                    onClick={triggerFileInput}
+                  >
+                    <input 
+                      type="file" 
+                      ref={fileInputRef}
+                      className="hidden" 
+                      accept="image/*" 
+                      multiple
+                      onChange={handleFileChange}
+                    />
+                    <Upload className="h-10 w-10 text-muted-foreground mb-2" />
+                    <p className="text-muted-foreground text-center">
+                      Click to upload images of your book<br />
+                      <span className="text-xs">
+                        Include front cover, back cover, and any notable details
+                      </span>
+                    </p>
+                  </div>
+                  
+                  {imageUrls.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+                      {imageUrls.map((url, index) => (
+                        <div key={index} className="relative group aspect-square">
+                          <img 
+                            src={url} 
+                            alt={`Book image ${index + 1}`}
+                            className="rounded-lg object-cover w-full h-full"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(index)}
+                            className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            aria-label="Remove image"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+              
+              <CardFooter className="flex justify-between">
+                <Button variant="outline" type="button" onClick={() => navigate(-1)}>
+                  Cancel
+                </Button>
+                <Button type="submit">List Book for Sale</Button>
+              </CardFooter>
+            </form>
           </Card>
+          
+          <div className="mt-8 bg-muted rounded-lg p-6">
+            <h2 className="text-xl font-medium mb-4">Selling Guidelines</h2>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>Be honest about the book's condition - describe any damage, highlights, or wear.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>Price your books competitively by checking similar listings.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>Include clear, well-lit images of your book from multiple angles.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>Respond promptly to buyer inquiries to increase your chances of a sale.</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Check className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                <span>Ship books within 2 business days of receiving payment.</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </main>
       
