@@ -1,96 +1,62 @@
 import { useState } from "react";
-import { 
-  BookOpen, 
-  Star, 
-  Shield, 
-  RefreshCw, 
-  Heart, 
-  Mail,
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin
-} from "lucide-react";
+import { BookOpen, Star, Shield, RefreshCw, Heart, Mail, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
-const teamMembers = [
-  {
-    name: "Sarah Johnson",
-    role: "Founder & CEO",
-    bio: "Book enthusiast and former publishing executive with 15 years of experience in the industry. Sarah founded BookNest with the vision of creating a community-driven marketplace for book lovers.",
-    avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Sarah",
-  },
-  {
-    name: "David Chen",
-    role: "Chief Technology Officer",
-    bio: "Tech innovator with a passion for literature. David leads our development team, ensuring BookNest delivers a seamless experience for readers and sellers alike.",
-    avatar: "https://api.dicebear.com/7.x/personas/svg?seed=David",
-  },
-  {
-    name: "Maya Patel",
-    role: "Community Manager",
-    bio: "Literature graduate and social media expert. Maya nurtures our growing community of book enthusiasts and coordinates our virtual and in-person events.",
-    avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Maya",
-  },
-  {
-    name: "James Wilson",
-    role: "Head of Operations",
-    bio: "Former bookstore owner with deep knowledge of the bookselling industry. James oversees our marketplace operations and seller relationships.",
-    avatar: "https://api.dicebear.com/7.x/personas/svg?seed=James",
-  },
-  {
-    name: "Olivia Martinez",
-    role: "Content Director",
-    bio: "Journalist and book reviewer who curates our featured selections and author spotlights. Olivia ensures that readers discover books they'll love.",
-    avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Olivia",
-  },
-];
-
-const values = [
-  {
-    icon: <BookOpen className="h-8 w-8 text-booknest-600" />,
-    title: "Love of Reading",
-    description: "We believe in the transformative power of books to educate, inspire, and connect people across the world."
-  },
-  {
-    icon: <Star className="h-8 w-8 text-booknest-600" />,
-    title: "Quality & Authenticity",
-    description: "We're committed to providing authentic books and creating a trustworthy marketplace for buyers and sellers."
-  },
-  {
-    icon: <Shield className="h-8 w-8 text-booknest-600" />,
-    title: "Community First",
-    description: "Our decisions are guided by what's best for our community of readers, fostering a space where book lovers can connect."
-  },
-  {
-    icon: <RefreshCw className="h-8 w-8 text-booknest-600" />,
-    title: "Sustainability",
-    description: "By facilitating the buying and selling of used books, we support environmental sustainability and reduce waste."
-  },
-  {
-    icon: <Heart className="h-8 w-8 text-booknest-600" />,
-    title: "Inclusivity",
-    description: "We champion diverse voices and stories, ensuring our platform represents the rich tapestry of human experience."
-  },
-];
-
+const teamMembers = [{
+  name: "Sarah Johnson",
+  role: "Founder & CEO",
+  bio: "Book enthusiast and former publishing executive with 15 years of experience in the industry. Sarah founded BookNest with the vision of creating a community-driven marketplace for book lovers.",
+  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Sarah"
+}, {
+  name: "David Chen",
+  role: "Chief Technology Officer",
+  bio: "Tech innovator with a passion for literature. David leads our development team, ensuring BookNest delivers a seamless experience for readers and sellers alike.",
+  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=David"
+}, {
+  name: "Maya Patel",
+  role: "Community Manager",
+  bio: "Literature graduate and social media expert. Maya nurtures our growing community of book enthusiasts and coordinates our virtual and in-person events.",
+  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Maya"
+}, {
+  name: "James Wilson",
+  role: "Head of Operations",
+  bio: "Former bookstore owner with deep knowledge of the bookselling industry. James oversees our marketplace operations and seller relationships.",
+  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=James"
+}, {
+  name: "Olivia Martinez",
+  role: "Content Director",
+  bio: "Journalist and book reviewer who curates our featured selections and author spotlights. Olivia ensures that readers discover books they'll love.",
+  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Olivia"
+}];
+const values = [{
+  icon: <BookOpen className="h-8 w-8 text-booknest-600" />,
+  title: "Love of Reading",
+  description: "We believe in the transformative power of books to educate, inspire, and connect people across the world."
+}, {
+  icon: <Star className="h-8 w-8 text-booknest-600" />,
+  title: "Quality & Authenticity",
+  description: "We're committed to providing authentic books and creating a trustworthy marketplace for buyers and sellers."
+}, {
+  icon: <Shield className="h-8 w-8 text-booknest-600" />,
+  title: "Community First",
+  description: "Our decisions are guided by what's best for our community of readers, fostering a space where book lovers can connect."
+}, {
+  icon: <RefreshCw className="h-8 w-8 text-booknest-600" />,
+  title: "Sustainability",
+  description: "By facilitating the buying and selling of used books, we support environmental sustainability and reduce waste."
+}, {
+  icon: <Heart className="h-8 w-8 text-booknest-600" />,
+  title: "Inclusivity",
+  description: "We champion diverse voices and stories, ensuring our platform represents the rich tapestry of human experience."
+}];
 const About = () => {
   const [activeTab, setActiveTab] = useState("story");
-
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       <Navbar />
       
       <main className="flex-grow">
@@ -121,19 +87,13 @@ const About = () => {
                   <p className="text-muted-foreground mb-4">
                     BookNest was born in 2020 from a simple idea: create a dedicated space where book lovers could buy, sell, and discuss the stories that matter to them.
                   </p>
-                  <p className="text-muted-foreground mb-4">
-                    Our founder, Sarah Johnson, was frustrated with generic marketplaces where books were treated like any other commodity. She envisioned a platform that understood the special relationship people have with their books—where each transaction could become a conversation about shared literary interests.
-                  </p>
+                  <p className="text-muted-foreground mb-4">Our founder, Sai Dinesh Pappala, was frustrated with generic marketplaces where books were treated like any other commodity. He envisioned a platform that understood the special relationship people have with their books—where each transaction could become a conversation about shared literary interests.</p>
                   <p className="text-muted-foreground">
                     What started as a small community of passionate readers has grown into a global platform, connecting bibliophiles across continents while maintaining the personal touch that makes book-sharing special.
                   </p>
                 </div>
                 <div className="rounded-lg overflow-hidden">
-                  <img 
-                    src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=1128&auto=format&fit=crop"
-                    alt="Library with books" 
-                    className="w-full h-full object-cover"
-                  />
+                  <img src="https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=1128&auto=format&fit=crop" alt="Library with books" className="w-full h-full object-cover" />
                 </div>
               </div>
               
@@ -199,8 +159,7 @@ const About = () => {
               <div>
                 <h2 className="text-3xl font-serif font-semibold mb-8 text-center">Our Values</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {values.map((value, index) => (
-                    <Card key={index}>
+                  {values.map((value, index) => <Card key={index}>
                       <CardHeader className="space-y-1 flex flex-col items-center text-center pb-2">
                         {value.icon}
                         <CardTitle className="mt-4">{value.title}</CardTitle>
@@ -208,8 +167,7 @@ const About = () => {
                       <CardContent className="text-center">
                         <p className="text-muted-foreground">{value.description}</p>
                       </CardContent>
-                    </Card>
-                  ))}
+                    </Card>)}
                 </div>
               </div>
               
@@ -252,8 +210,7 @@ const About = () => {
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {teamMembers.map((member, index) => (
-                  <Card key={index}>
+                {teamMembers.map((member, index) => <Card key={index}>
                     <CardHeader className="text-center">
                       <Avatar className="h-24 w-24 mx-auto mb-4">
                         <AvatarImage src={member.avatar} alt={member.name} />
@@ -265,8 +222,7 @@ const About = () => {
                     <CardContent className="text-center">
                       <p className="text-muted-foreground">{member.bio}</p>
                     </CardContent>
-                  </Card>
-                ))}
+                  </Card>)}
               </div>
               
               <div className="bg-muted rounded-lg p-8 text-center">
@@ -307,8 +263,6 @@ const About = () => {
       </main>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default About;
