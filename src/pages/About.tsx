@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { 
   BookOpen, 
@@ -114,6 +113,7 @@ const About = () => {
               </TabsList>
             </div>
             
+            {/* Story Tab Content */}
             <TabsContent value="story" className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div>
@@ -185,6 +185,7 @@ const About = () => {
               </div>
             </TabsContent>
             
+            {/* Mission Tab Content */}
             <TabsContent value="mission" className="space-y-12">
               <div className="text-center max-w-3xl mx-auto">
                 <h2 className="text-3xl font-serif font-semibold mb-4">Our Mission</h2>
@@ -241,6 +242,7 @@ const About = () => {
               </div>
             </TabsContent>
             
+            {/* Team Tab Content */}
             <TabsContent value="team" className="space-y-8">
               <div className="text-center max-w-3xl mx-auto mb-8">
                 <h2 className="text-3xl font-serif font-semibold mb-4">Meet Our Team</h2>

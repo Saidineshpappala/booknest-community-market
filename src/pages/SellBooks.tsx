@@ -1,7 +1,7 @@
 
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, Upload } from "lucide-react";
+import { Check, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -323,3 +323,4 @@ const SellBooks = () => {
 };
 
 export default SellBooks;
+
