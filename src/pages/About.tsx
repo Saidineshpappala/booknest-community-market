@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { BookOpen, Star, Shield, RefreshCw, Heart, Mail, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ const teamMembers = [{
   name: "Sai Dinesh Pappala",
   role: "Founder & CEO",
   bio: "Book enthusiast and former publishing executive with 15 years of experience in the industry. Sai Dinesh founded BookNest with the vision of creating a community-driven marketplace for book lovers.",
-  avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Sai"
+  avatar: "/lovable-uploads/c3fe7cf5-9c4d-43c0-82b8-9d31aecdaad5.png"
 }, {
   name: "Krish",
   role: "Community Manager",
