@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { BookOpen, Star, Shield, RefreshCw, Heart, Mail, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-
 const teamMembers = [{
   name: "Sai Dinesh Pappala",
   role: "Founder & CEO",
@@ -30,7 +28,6 @@ const teamMembers = [{
   bio: "Journalist and book reviewer who curates our featured selections and author spotlights. Anand ensures that readers discover books they'll love.",
   avatar: "https://api.dicebear.com/7.x/personas/svg?seed=Anand"
 }];
-
 const values = [{
   icon: <BookOpen className="h-8 w-8 text-booknest-600" />,
   title: "Love of Reading",
@@ -52,7 +49,6 @@ const values = [{
   title: "Inclusivity",
   description: "We champion diverse voices and stories, ensuring our platform represents the rich tapestry of human experience."
 }];
-
 const About = () => {
   const [activeTab, setActiveTab] = useState("story");
   return <div className="min-h-screen flex flex-col">
@@ -104,7 +100,7 @@ const About = () => {
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-background text-muted-foreground">2020</div>
                     <div>
                       <h3 className="font-medium">BookNest Founded</h3>
-                      <p className="text-muted-foreground">Sarah Johnson launched BookNest with a small team of five and an initial community of 500 users.</p>
+                      <p className="text-muted-foreground">Dinesh launched BookNest with a small team of four and an initial community of 500 users.</p>
                     </div>
                   </div>
                   
@@ -120,7 +116,7 @@ const About = () => {
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border bg-background text-muted-foreground">2022</div>
                     <div>
                       <h3 className="font-medium">International Expansion</h3>
-                      <p className="text-muted-foreground">Launched in Europe and Asia, introduced multilingual support, and reached 1 million books sold.</p>
+                      <p className="text-muted-foreground">Launched in India, introduced multilingual support, and reached 1 million books sold.</p>
                     </div>
                   </div>
                   
