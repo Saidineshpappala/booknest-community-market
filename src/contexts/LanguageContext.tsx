@@ -6,7 +6,7 @@ type SupportedLanguage = "en" | "es" | "fr" | "de" | "zh";
 interface LanguageContextType {
   language: SupportedLanguage;
   setLanguage: (lang: SupportedLanguage) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const defaultLanguage: SupportedLanguage = "en";
@@ -26,6 +26,8 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     "nav.latefees": "Late Fees",
     "welcome": "Welcome to BookNest",
     "footer.copyright": "© 2025 BookNest. All rights reserved.",
+    "books.addedToCart": "Added to Cart",
+    "books.itemAddedToCart": "{title} has been added to your cart",
     // Add more translations here
   },
   es: {
@@ -42,6 +44,8 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     "nav.latefees": "Multas por Retraso",
     "welcome": "Bienvenido a BookNest",
     "footer.copyright": "© 2025 BookNest. Todos los derechos reservados.",
+    "books.addedToCart": "Añadido al Carrito",
+    "books.itemAddedToCart": "{title} ha sido añadido a tu carrito",
     // Add more translations here
   },
   fr: {
@@ -58,6 +62,8 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     "nav.latefees": "Frais de Retard",
     "welcome": "Bienvenue à BookNest",
     "footer.copyright": "© 2025 BookNest. Tous droits réservés.",
+    "books.addedToCart": "Ajouté au Panier",
+    "books.itemAddedToCart": "{title} a été ajouté à votre panier",
     // Add more translations here
   },
   de: {
@@ -74,6 +80,8 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     "nav.latefees": "Säumnisgebühren",
     "welcome": "Willkommen bei BookNest",
     "footer.copyright": "© 2025 BookNest. Alle Rechte vorbehalten.",
+    "books.addedToCart": "Zum Warenkorb Hinzugefügt",
+    "books.itemAddedToCart": "{title} wurde Ihrem Warenkorb hinzugefügt",
     // Add more translations here
   },
   zh: {
@@ -90,6 +98,8 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     "nav.latefees": "逾期费用",
     "welcome": "欢迎来到 BookNest",
     "footer.copyright": "© 2025 BookNest. 保留所有权利。",
+    "books.addedToCart": "已添加到购物车",
+    "books.itemAddedToCart": "{title} 已添加到您的购物车",
     // Add more translations here
   }
 };
@@ -117,9 +127,18 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     setLanguageState(lang);
   };
 
-  // Translation function
-  const t = (key: string): string => {
-    return translations[language][key] || translations["en"][key] || key;
+  // Enhanced translation function with parameter support
+  const t = (key: string, params?: Record<string, string | number>): string => {
+    let text = translations[language][key] || translations["en"][key] || key;
+    
+    // Replace parameters if provided
+    if (params) {
+      Object.entries(params).forEach(([paramKey, paramValue]) => {
+        text = text.replace(`{${paramKey}}`, String(paramValue));
+      });
+    }
+    
+    return text;
   };
 
   const value = {
