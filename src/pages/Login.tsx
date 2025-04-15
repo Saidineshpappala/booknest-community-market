@@ -9,39 +9,72 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { BookOpen } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
+
+  const validatePassword = (pwd: string) => {
+    // Allow any special characters in password - fixed bug
+    return pwd.length >= 6;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage("");
+    
+    if (!validatePassword(password)) {
+      setErrorMessage("Password must be at least 6 characters long");
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
-      // In a real app, you would validate credentials with a backend
-      // For demo purposes, we'll simulate a successful login
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Store user info in localStorage
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("user", JSON.stringify({ email }));
-      
-      toast({
-        title: "Login successful",
-        description: "Welcome back to BookNest!",
-      });
+      // Check if Supabase is connected
+      if (supabase) {
+        // Try to sign in with Supabase
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Login successful",
+          description: "Welcome back to BookNest!",
+        });
+      } else {
+        // Fallback to demo login
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Store user info in localStorage
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("user", JSON.stringify({ email }));
+        
+        toast({
+          title: "Login successful",
+          description: "Welcome back to BookNest!",
+        });
+      }
       
       navigate("/books");
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : "Please check your credentials and try again.";
       toast({
         variant: "destructive",
         title: "Login failed",
-        description: "Please check your credentials and try again.",
+        description: errorMsg,
       });
+      setErrorMessage(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +96,11 @@ const Login = () => {
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
+              {errorMessage && (
+                <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+                  {errorMessage}
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input

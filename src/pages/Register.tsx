@@ -9,40 +9,78 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { BookOpen } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
+
+  const validatePassword = (pwd: string) => {
+    // Allow any special characters in password - fixed bug
+    return pwd.length >= 6;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage("");
+    
+    if (!validatePassword(password)) {
+      setErrorMessage("Password must be at least 6 characters long");
+      return;
+    }
+    
     setIsLoading(true);
 
     try {
-      // In a real app, you would create a user account with a backend
-      // For demo purposes, we'll simulate a successful registration
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Store user info in localStorage
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("user", JSON.stringify({ name, email }));
-      
-      toast({
-        title: "Registration successful",
-        description: "Welcome to BookNest! Your account has been created.",
-      });
+      // Check if Supabase is connected
+      if (supabase) {
+        // Try to sign up with Supabase
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              name,
+            },
+          },
+        });
+        
+        if (error) throw error;
+        
+        toast({
+          title: "Registration successful",
+          description: "Welcome to BookNest! Your account has been created.",
+        });
+      } else {
+        // Fallback to demo registration
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Store user info in localStorage
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("user", JSON.stringify({ name, email }));
+        
+        toast({
+          title: "Registration successful",
+          description: "Welcome to BookNest! Your account has been created.",
+        });
+      }
       
       navigate("/books");
     } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : "Please try again later.";
       toast({
         variant: "destructive",
         title: "Registration failed",
-        description: "Please try again later.",
+        description: errorMsg,
       });
+      setErrorMessage(errorMsg);
     } finally {
       setIsLoading(false);
     }
@@ -64,6 +102,11 @@ const Register = () => {
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
+              {errorMessage && (
+                <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+                  {errorMessage}
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
@@ -95,6 +138,9 @@ const Register = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  Password must be at least 6 characters long.
+                </p>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
