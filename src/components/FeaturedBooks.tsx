@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Heart, ShoppingCart } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/components/ui/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 type BookItem = {
   id: string;
@@ -21,12 +22,21 @@ type BookItem = {
   };
 };
 
+// Reliable book covers that won't break
+const bookCovers = [
+  "https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+  "https://images.unsplash.com/photo-1495640452828-3df6795cf69b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+  "https://images.unsplash.com/photo-1603162925312-16c138c2d7d3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80",
+  "https://images.unsplash.com/photo-1629992101753-56d196c8aabb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=690&q=80",
+  "https://images.unsplash.com/photo-1586339392738-d6ae85b5d5a7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
+];
+
 const books: BookItem[] = [
   {
     id: "b1",
     title: "The Midnight Library",
     author: "Matt Haig",
-    cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+    cover: bookCovers[0],
     price: 12.99,
     originalPrice: 16.99,
     condition: "new",
@@ -39,7 +49,7 @@ const books: BookItem[] = [
     id: "b2",
     title: "Educated",
     author: "Tara Westover",
-    cover: "https://images.unsplash.com/photo-1495640452828-3df6795cf69b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+    cover: bookCovers[1],
     price: 9.50,
     condition: "used",
     seller: {
@@ -51,7 +61,7 @@ const books: BookItem[] = [
     id: "b3",
     title: "To Kill a Mockingbird",
     author: "Harper Lee",
-    cover: "https://images.unsplash.com/photo-1603162925312-16c138c2d7d3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80",
+    cover: bookCovers[2],
     price: 35.99,
     condition: "rare",
     seller: {
@@ -63,7 +73,7 @@ const books: BookItem[] = [
     id: "b9",
     title: "Dune",
     author: "Frank Herbert",
-    cover: "https://images.unsplash.com/photo-1586339392738-d6ae85b5d5a7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
+    cover: bookCovers[4],
     price: 18.99,
     condition: "new",
     seller: {
@@ -76,6 +86,7 @@ const books: BookItem[] = [
 const FeaturedBooks = () => {
   const { addItem } = useCart();
   const { toast } = useToast();
+  const { t } = useLanguage();
 
   const handleAddToCart = (book: BookItem) => {
     addItem({
@@ -88,30 +99,40 @@ const FeaturedBooks = () => {
     });
     
     toast({
-      title: "Added to cart",
-      description: `${book.title} has been added to your cart.`,
+      title: t('books.addedToCart'),
+      description: t('books.itemAddedToCart', { title: book.title }),
     });
+  };
+
+  // Check if image URLs are valid
+  const getBookCover = (url: string, index: number) => {
+    // Fallback to a stable image from the bookCovers array
+    return url || bookCovers[index % bookCovers.length];
   };
 
   return (
     <section className="bg-muted/30 py-12 md:py-16">
       <div className="container">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold">Featured Books</h2>
+          <h2 className="text-2xl md:text-3xl font-bold">{t('home.featuredBooks')}</h2>
           <Link to="/books" className="text-booknest-600 hover:text-booknest-700 font-medium">
-            View All
+            {t('home.viewAll')}
           </Link>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {books.map((book) => (
+          {books.map((book, index) => (
             <Card key={book.id} className="overflow-hidden hover:shadow-md transition-shadow h-full flex flex-col">
               <div className="relative">
                 <Link to={`/books/${book.id}`}>
                   <div className="aspect-[2/3] overflow-hidden">
                     <img 
-                      src={book.cover} 
+                      src={getBookCover(book.cover, index)} 
                       alt={book.title}
                       className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-300" 
+                      onError={(e) => {
+                        // If image fails to load, set a fallback
+                        (e.target as HTMLImageElement).src = bookCovers[index % bookCovers.length];
+                      }}
                     />
                   </div>
                 </Link>
@@ -121,13 +142,13 @@ const FeaturedBooks = () => {
                   className="absolute top-2 right-2 bg-white/80 hover:bg-white rounded-full"
                 >
                   <Heart className="h-4 w-4" />
-                  <span className="sr-only">Add to wishlist</span>
+                  <span className="sr-only">{t('books.addToWishlist')}</span>
                 </Button>
                 {book.condition === "rare" && (
-                  <Badge className="absolute top-2 left-2 bg-amber-500">Rare Find</Badge>
+                  <Badge className="absolute top-2 left-2 bg-amber-500">{t('books.rareFind')}</Badge>
                 )}
                 {book.condition === "used" && (
-                  <Badge variant="secondary" className="absolute top-2 left-2">Used</Badge>
+                  <Badge variant="secondary" className="absolute top-2 left-2">{t('books.used')}</Badge>
                 )}
               </div>
               <CardContent className="flex-grow flex flex-col pt-4">
@@ -144,7 +165,7 @@ const FeaturedBooks = () => {
                   )}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  Seller: {book.seller.name} ({book.seller.rating})
+                  {t('books.seller')}: {book.seller.name} ({book.seller.rating})
                 </div>
               </CardContent>
               <CardFooter className="pt-0">
@@ -153,7 +174,7 @@ const FeaturedBooks = () => {
                   onClick={() => handleAddToCart(book)}
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
-                  Add to Cart
+                  {t('books.addToCart')}
                 </Button>
               </CardFooter>
             </Card>

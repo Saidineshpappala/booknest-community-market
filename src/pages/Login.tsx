@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { BookOpen } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -20,6 +21,19 @@ const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const { login } = useAuth();
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        navigate("/books");
+      }
+    };
+    
+    checkSession();
+  }, [navigate]);
 
   const validatePassword = (pwd: string) => {
     // Allow any special characters in password - fixed bug
@@ -38,36 +52,27 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Check if Supabase is connected
-      if (supabase) {
-        // Try to sign in with Supabase
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        
-        if (error) throw error;
-        
-        toast({
-          title: "Login successful",
-          description: "Welcome back to BookNest!",
-        });
-      } else {
-        // Fallback to demo login
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Store user info in localStorage
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("user", JSON.stringify({ email }));
-        
-        toast({
-          title: "Login successful",
-          description: "Welcome back to BookNest!",
-        });
-      }
+      // Try to sign in with Supabase
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
       
-      navigate("/books");
+      if (error) throw error;
+      
+      if (data && data.user) {
+        // Use auth context login method to update app state
+        await login(email, password);
+        
+        toast({
+          title: "Login successful",
+          description: "Welcome back to BookNest!",
+        });
+        
+        navigate("/books");
+      }
     } catch (error) {
+      console.error("Login error:", error);
       const errorMsg = error instanceof Error ? error.message : "Please check your credentials and try again.";
       toast({
         variant: "destructive",
@@ -89,9 +94,9 @@ const Login = () => {
             <div className="flex items-center justify-center w-12 h-12 rounded-full bg-booknest-600/10 mb-4">
               <BookOpen className="h-6 w-6 text-booknest-600" />
             </div>
-            <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">{t('login.welcome')}</CardTitle>
             <CardDescription className="text-center">
-              Enter your credentials to access your account
+              {t('login.enterCredentials')}
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -102,7 +107,7 @@ const Login = () => {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('login.email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -114,9 +119,9 @@ const Login = () => {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('login.password')}</Label>
                   <Link to="/forgot-password" className="text-sm text-booknest-600 hover:underline">
-                    Forgot password?
+                    {t('login.forgotPassword')}
                   </Link>
                 </div>
                 <Input
@@ -134,12 +139,12 @@ const Login = () => {
                 className="w-full bg-booknest-600 hover:bg-booknest-700" 
                 disabled={isLoading}
               >
-                {isLoading ? "Signing in..." : "Sign in"}
+                {isLoading ? t('login.signingIn') : t('login.signIn')}
               </Button>
               <div className="text-center text-sm">
-                Don't have an account?{" "}
+                {t('login.noAccount')}{" "}
                 <Link to="/register" className="text-booknest-600 hover:underline">
-                  Sign up
+                  {t('login.signUp')}
                 </Link>
               </div>
             </CardFooter>
