@@ -34,7 +34,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(currentSession?.user ?? null);
         
         if (currentSession?.user) {
+          // Extract name from user metadata if available
+          const userName = currentSession.user.user_metadata?.name || 
+                           currentSession.user.user_metadata?.full_name || 
+                           '';
+          
           setUserProfile({
+            name: userName,
             email: currentSession.user.email || "",
           });
           setIsLoggedIn(true);
@@ -42,6 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           // Store basic user info in localStorage as fallback
           localStorage.setItem("isLoggedIn", "true");
           localStorage.setItem("user", JSON.stringify({
+            name: userName,
             email: currentSession.user.email,
           }));
         } else {
@@ -59,7 +66,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(currentSession?.user ?? null);
       
       if (currentSession?.user) {
+        // Extract name from user metadata if available
+        const userName = currentSession.user.user_metadata?.name || 
+                         currentSession.user.user_metadata?.full_name || 
+                         '';
+        
         setUserProfile({
+          name: userName,
           email: currentSession.user.email || "",
         });
         setIsLoggedIn(true);
@@ -67,6 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Store basic user info in localStorage as fallback
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("user", JSON.stringify({
+          name: userName,
           email: currentSession.user.email,
         }));
       }

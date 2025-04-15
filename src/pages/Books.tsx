@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -31,7 +30,6 @@ type BookItem = {
   };
 };
 
-// Reliable book covers that won't break
 const bookCovers = [
   "https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
   "https://images.unsplash.com/photo-1495640452828-3df6795cf69b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80",
@@ -40,7 +38,6 @@ const bookCovers = [
   "https://images.unsplash.com/photo-1586339392738-d6ae85b5d5a7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80"
 ];
 
-// Updated all book data with reliable cover images
 const allBooks: BookItem[] = [
   {
     id: "b1",
@@ -240,7 +237,6 @@ const Books = () => {
   const [sortBy, setSortBy] = useState("relevance");
   const { addItem } = useCart();
 
-  // Handle initial search params
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const searchQuery = queryParams.get("search");
@@ -249,7 +245,6 @@ const Books = () => {
     }
   }, [location.search]);
 
-  // Filter books based on all criteria
   useEffect(() => {
     let result = [...allBooks];
 
@@ -347,9 +342,7 @@ const Books = () => {
     navigate(`${location.pathname}?${queryParams.toString()}`);
   };
 
-  // Check if image URLs are valid and render correctly
   const getBookCover = (url: string, index: number) => {
-    // Fallback to a stable image from the bookCovers array
     return url || bookCovers[index % bookCovers.length];
   };
 
@@ -526,7 +519,6 @@ const Books = () => {
                             alt={book.title}
                             className="object-cover w-full h-full transform hover:scale-105 transition-transform duration-300" 
                             onError={(e) => {
-                              // If image fails to load, set a fallback
                               (e.target as HTMLImageElement).src = bookCovers[index % bookCovers.length];
                             }}
                           />

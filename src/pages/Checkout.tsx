@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
@@ -18,7 +17,7 @@ type CheckoutStep = "shipping" | "payment" | "confirmation";
 
 const Checkout = () => {
   const { items, subTotal, clearCart } = useCart();
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, userProfile } = useAuth();
   const navigate = useNavigate();
   
   const [step, setStep] = useState<CheckoutStep>("shipping");
@@ -26,8 +25,8 @@ const Checkout = () => {
   
   // Shipping form state
   const [shippingDetails, setShippingDetails] = useState({
-    fullName: user?.name || "",
-    email: user?.email || "",
+    fullName: userProfile?.name || "",
+    email: userProfile?.email || "",
     address: "",
     city: "",
     state: "",

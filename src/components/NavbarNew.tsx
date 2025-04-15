@@ -16,7 +16,7 @@ import LanguageSelector from "./LanguageSelector";
 
 const NavbarNew = () => {
   const location = useLocation();
-  const { isLoggedIn, user, logout } = useAuth();
+  const { isLoggedIn, user, userProfile, logout } = useAuth();
   const { items } = useCart();
   const { t } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -122,7 +122,7 @@ const NavbarNew = () => {
             {isLoggedIn && (
               <Button size="sm" variant="ghost" className="gap-2">
                 <User className="h-4 w-4" />
-                <span className="hidden lg:inline-block">{user?.name?.split(' ')[0] || 'User'}</span>
+                <span className="hidden lg:inline-block">{userProfile?.name?.split(' ')[0] || 'User'}</span>
               </Button>
             )}
           </div>
@@ -168,7 +168,7 @@ const NavbarNew = () => {
                   {isLoggedIn && (
                     <div className="flex items-center gap-2 text-base font-medium mt-4">
                       <User className="h-4 w-4" />
-                      <span>{user?.name || 'User'}</span>
+                      <span>{userProfile?.name || 'User'}</span>
                     </div>
                   )}
                 </nav>
