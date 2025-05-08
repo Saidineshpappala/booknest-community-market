@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,22 +21,16 @@ const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
-  const { login } = useAuth();
+  const { login, isLoggedIn } = useAuth();
 
   // Check if user is already logged in
   useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        navigate("/books");
-      }
-    };
-    
-    checkSession();
-  }, [navigate]);
+    if (isLoggedIn) {
+      navigate("/books");
+    }
+  }, [isLoggedIn, navigate]);
 
   const validatePassword = (pwd: string) => {
-    // Allow any special characters in password - fixed bug
     return pwd.length >= 6;
   };
 
@@ -52,37 +46,45 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // Try to sign in with Supabase
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      // Use the login method from AuthContext
+      await login(email, password);
+      
+      toast({
+        title: "Login successful",
+        description: "Welcome back to BookNest!",
       });
       
-      if (error) throw error;
-      
-      if (data && data.user) {
-        // Use auth context login method to update app state
-        await login(email, password);
-        
-        toast({
-          title: "Login successful",
-          description: "Welcome back to BookNest!",
-        });
-        
-        navigate("/books");
-      }
-    } catch (error) {
+      // The navigation will happen automatically due to the useEffect
+      // that watches isLoggedIn state
+    } catch (error: any) {
       console.error("Login error:", error);
-      const errorMsg = error instanceof Error ? error.message : "Please check your credentials and try again.";
+      const errorMsg = error instanceof Error 
+        ? error.message 
+        : "Please check your credentials and try again.";
+      
       toast({
         variant: "destructive",
         title: "Login failed",
         description: errorMsg,
       });
+      
       setErrorMessage(errorMsg);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Add translations for login page
+  const loginTranslations = {
+    "login.welcome": "Welcome Back",
+    "login.enterCredentials": "Enter your credentials to sign in",
+    "login.email": "Email",
+    "login.password": "Password",
+    "login.forgotPassword": "Forgot Password?",
+    "login.signIn": "Sign In",
+    "login.signingIn": "Signing In...",
+    "login.noAccount": "Don't have an account?",
+    "login.signUp": "Sign Up"
   };
 
   return (
@@ -139,7 +141,14 @@ const Login = () => {
                 className="w-full bg-booknest-600 hover:bg-booknest-700" 
                 disabled={isLoading}
               >
-                {isLoading ? t('login.signingIn') : t('login.signIn')}
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {t('login.signingIn')}
+                  </>
+                ) : (
+                  t('login.signIn')
+                )}
               </Button>
               <div className="text-center text-sm">
                 {t('login.noAccount')}{" "}

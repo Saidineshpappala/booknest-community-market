@@ -28,6 +28,15 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     "footer.copyright": "© 2025 BookNest. All rights reserved.",
     "books.addedToCart": "Added to Cart",
     "books.itemAddedToCart": "{title} has been added to your cart",
+    "login.welcome": "Welcome Back",
+    "login.enterCredentials": "Enter your credentials to sign in",
+    "login.email": "Email",
+    "login.password": "Password",
+    "login.forgotPassword": "Forgot Password?",
+    "login.signIn": "Sign In",
+    "login.signingIn": "Signing In...",
+    "login.noAccount": "Don't have an account?",
+    "login.signUp": "Sign Up"
     // Add more translations here
   },
   es: {
@@ -46,6 +55,15 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     "footer.copyright": "© 2025 BookNest. Todos los derechos reservados.",
     "books.addedToCart": "Añadido al Carrito",
     "books.itemAddedToCart": "{title} ha sido añadido a tu carrito",
+    "login.welcome": "Bienvenido de nuevo",
+    "login.enterCredentials": "Ingresa tus credenciales para iniciar sesión",
+    "login.email": "Correo electrónico",
+    "login.password": "Contraseña",
+    "login.forgotPassword": "¿Olvidaste tu contraseña?",
+    "login.signIn": "Iniciar Sesión",
+    "login.signingIn": "Iniciando sesión...",
+    "login.noAccount": "¿No tienes una cuenta?",
+    "login.signUp": "Regístrate"
     // Add more translations here
   },
   fr: {
@@ -64,6 +82,15 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     "footer.copyright": "© 2025 BookNest. Tous droits réservés.",
     "books.addedToCart": "Ajouté au Panier",
     "books.itemAddedToCart": "{title} a été ajouté à votre panier",
+    "login.welcome": "Bon retour",
+    "login.enterCredentials": "Entrez vos identifiants pour vous connecter",
+    "login.email": "E-mail",
+    "login.password": "Mot de passe",
+    "login.forgotPassword": "Mot de passe oublié?",
+    "login.signIn": "Se connecter",
+    "login.signingIn": "Connexion en cours...",
+    "login.noAccount": "Vous n'avez pas de compte?",
+    "login.signUp": "S'inscrire"
     // Add more translations here
   },
   de: {
@@ -82,6 +109,15 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     "footer.copyright": "© 2025 BookNest. Alle Rechte vorbehalten.",
     "books.addedToCart": "Zum Warenkorb Hinzugefügt",
     "books.itemAddedToCart": "{title} wurde Ihrem Warenkorb hinzugefügt",
+    "login.welcome": "Willkommen zurück",
+    "login.enterCredentials": "Geben Sie Ihre Anmeldedaten ein",
+    "login.email": "E-Mail",
+    "login.password": "Passwort",
+    "login.forgotPassword": "Passwort vergessen?",
+    "login.signIn": "Anmelden",
+    "login.signingIn": "Anmeldung läuft...",
+    "login.noAccount": "Haben Sie kein Konto?",
+    "login.signUp": "Registrieren"
     // Add more translations here
   },
   zh: {
@@ -100,6 +136,15 @@ const translations: Record<SupportedLanguage, Record<string, string>> = {
     "footer.copyright": "© 2025 BookNest. 保留所有权利。",
     "books.addedToCart": "已添加到购物车",
     "books.itemAddedToCart": "{title} 已添加到您的购物车",
+    "login.welcome": "欢迎回来",
+    "login.enterCredentials": "请输入您的凭据以登录",
+    "login.email": "电子邮件",
+    "login.password": "密码",
+    "login.forgotPassword": "忘记密码？",
+    "login.signIn": "登录",
+    "login.signingIn": "登录中...",
+    "login.noAccount": "没有账户？",
+    "login.signUp": "注册"
     // Add more translations here
   }
 };
